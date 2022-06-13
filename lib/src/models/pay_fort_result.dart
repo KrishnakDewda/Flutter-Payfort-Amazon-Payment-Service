@@ -2,35 +2,161 @@ import 'package:amazon_payfort/src/enums/response_status.dart';
 
 class PayfortResult {
   PayfortResult({
-    required this.status,
-    required this.message,
-    required this.code,
+    this.responseCode,
+    this.responseStatus,
+    this.responseMessage,
+    this.command,
+    this.merchantReference,
+    this.amount,
+    this.currency,
+    this.fortId,
+    this.customerEmail,
+    this.sdkToken,
+    this.tokenName,
+    this.paymentOption,
+    this.eci,
+    this.authorizationCode,
+    this.customerIp,
+    this.customerName,
+    this.expiryDate,
+    this.cardNumber,
+    this.status,
+    this.phoneNumber,
   });
 
-  /// Transaction status code
-  /// 
-  String code;
+  /// Response Code carries the value of our system’s response. *The code consists of five digits,
+  /// the first 2 digits represent the response status [https://paymentservices-reference.payfort.com/docs/api/build/index.html?java#statuses],
+  /// and the last 3 digits represent the response messages [https://paymentservices-reference.payfort.com/docs/api/build/index.html?java#messages].
+  ///
+  String? responseCode;
 
   /// Transaction status : [success], [failure] and [canceled]
-  ResponseStatus status;
+  ResponseStatus? responseStatus;
 
-  /// Transaction message
-  /// 
-  String message;
+  /// The message description of the response code; it returns according to the request language..
+  ///
+  String? responseMessage;
+
+  /// Command
+  ///
+  String? command;
+
+  /// The Merchant’s unique order number.
+  ///
+  String? merchantReference;
+
+  /// The transaction’s amount.
+  /// Each currency has predefined allowed decimal points that should be taken into consideration when sending the amount.
+  ///
+  String? amount;
+
+  /// The currency of the transaction’s amount in ISO code 3.
+  ///
+  String? currency;
+
+  /// The order’s unique reference returned by Amazon Payfort system.
+  ///
+  String? fortId;
+
+  /// The customer’s email.
+  ///
+  String? customerEmail;
+
+  /// An SDK Token to enable using the Amazon Payment Services Mobile SDK.
+  ///
+  String? sdkToken;
+
+  /// The Token received from the Tokenization process.
+  ///
+  String? tokenName;
+
+  /// Payment option. [MASTERCARD], [VISA], [AMEX] etc...
+  ///
+  String? paymentOption;
+
+  /// The E-commerce indicator.
+  ///
+  String? eci;
+
+  /// The authorization code returned from the 3rd party.
+  ///
+  String? authorizationCode;
+
+  /// It holds the description of the order.
+  ///
+  String? orderDescription;
+
+  /// It holds the customer’s IP address.
+  ///
+  String? customerIp;
+
+  /// The customer’s name.
+  ///
+  String? customerName;
+
+  /// The card’s expiry date.
+  ///
+  String? expiryDate;
+
+  /// The masked credit card’s number. Only the [MEEZA] payment option takes 19 digits card number.
+  ///
+  String? cardNumber;
+
+  /// A two-digit numeric value that indicates the status of the transaction.
+  ///
+  String? status;
+
+  /// The customer’s phone number.
+  ///
+  String? phoneNumber;
 
   factory PayfortResult.fromMap(Map<String, dynamic> data) {
     return PayfortResult(
-      code: data['response_code'],
-      status: ResponseStatus.values[data['response_status']],
-      message: data['response_message'],
+      responseCode: data['response_code'],
+      responseStatus: ResponseStatus.values[data['response_status']],
+      responseMessage: data['response_message'],
+      command: data['command'],
+      merchantReference: data['merchant_reference'],
+      amount: data['amount'],
+      currency: data['currency'],
+      fortId: data['fortId'],
+      customerEmail: data['customerEmail'],
+      sdkToken: data['sdkToken'],
+      tokenName: data['tokenName'],
+      paymentOption: data['paymentOption'],
+      eci: data['eci'],
+      authorizationCode: data['authorizationCode'],
+      customerIp: data['customerIp'],
+      customerName: data['customerName'],
+      expiryDate: data['expiryDate'],
+      cardNumber: data['cardNumber'],
+      status: data['status'],
+      phoneNumber: data['phoneNumber'],
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'response_code': code,
-      'response_status': status.index,
-      'response_message': message,
+    return <String, dynamic>{
+      'response_code': responseCode,
+      'response_status': responseStatus?.index,
+      'response_message': responseMessage,
+      'command': command,
+      'merchant_reference': merchantReference,
+      'amount': amount,
+      'currency': currency,
+      'fort_id': fortId,
+      'customer_email': customerEmail,
+      'sdkToken': sdkToken,
+      'token_name': tokenName,
+      'payment_option': paymentOption,
+      'eci': eci,
+      'authorization_code': authorizationCode,
+      'customer_ip': customerIp,
+      'customer_name': customerName,
+      'expiry_date': expiryDate,
+      'card_number': cardNumber,
+      'status': status,
+      'phone_number': phoneNumber,
     };
   }
 }

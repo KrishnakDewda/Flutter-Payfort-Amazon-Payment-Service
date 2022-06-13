@@ -54,7 +54,8 @@ class AmazonPayfort {
   /// These are the URLs you need to use when you request a mobile SDK token for your app:
   ///
   Future<String?> getEnvironmentBaseUrl() {
-    return AmazonPayfortPlatform.instance.getEnvironmentBaseUrl(_environment);
+    return AmazonPayfortPlatform.instance
+        .getEnvironmentBaseUrl(_instance?._environment);
   }
 
   /// Please make sure to use the following function to generate the [device_id] parameter value that
@@ -84,7 +85,7 @@ class AmazonPayfort {
   ///
   Future<PayfortResult> processingTransaction(FortRequest request) {
     return AmazonPayfortPlatform.instance.processingTransaction(
-      environment: _environment,
+      environment: _instance?._environment,
       request: request,
     );
   }

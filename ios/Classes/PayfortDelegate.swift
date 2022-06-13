@@ -35,6 +35,11 @@ public class PayFortDelegate: NSObject {
             "merchant_reference" : (requestData["merchant_reference"] as? String) ?? "",
             "order_description" : (requestData["order_description"] as? String) ?? "",
             "sdk_token" : (requestData["sdk_token"] as? String) ?? "",
+            "token_name" : (requestData["token_name"] as? String) ?? "",
+            "payment_option" : (requestData["payment_option"] as? String) ?? "",
+            "eci" : (requestData["eci"] as? String) ?? "",
+            "customer_ip" : (requestData["customer_ip"] as? String) ?? "",
+            "phone_number" : (requestData["phone_number"] as? String) ?? "",
         ]
         
         payFort?.hideLoading = true
@@ -50,9 +55,7 @@ public class PayFortDelegate: NSObject {
                 
                 var response = [String : Any]()
                 response["response_status"] = 0
-                response["response_code"] = responeDic["response_code"]
-                response["response_message"] = responeDic["response_message"]
-                
+                responeDic.forEach { (key, value) in response[key] = value }
                 return result(response)
                 
             },
@@ -62,9 +65,7 @@ public class PayFortDelegate: NSObject {
                 
                 var response = [String : Any]()
                 response["response_status"] = 2
-                response["response_code"] = responeDic["response_code"]
-                response["response_message"] = responeDic["response_message"]
-                
+                responeDic.forEach { (key, value) in response[key] = value }
                 return result(response)
                 
             },
@@ -74,9 +75,7 @@ public class PayFortDelegate: NSObject {
                 
                 var response = [String : Any]()
                 response["response_status"] = 1
-                response["response_code"] = responeDic["response_code"]
-                response["response_message"] = message
-                
+                responeDic.forEach { (key, value) in response[key] = value }
                 return result(response)
             }
         )

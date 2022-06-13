@@ -5,9 +5,14 @@ class FortRequest {
     required this.customerEmail,
     required this.orderDescription,
     required this.sdkToken,
+    required this.customerIp,
     this.currency = 'USD',
     this.language = 'en',
     this.merchantReference,
+    this.tokenName,
+    this.paymentOption,
+    this.eci,
+    this.phoneNumber,
   }) : command = 'PURCHASE';
 
   /// Request Command.
@@ -49,6 +54,28 @@ class FortRequest {
   ///
   String sdkToken;
 
+  /// The Token received from the Tokenization process..
+  ///
+  String? tokenName;
+
+  /// Payment option. [MASTERCARD], [VISA], [AMEX] etc...
+  ///
+  String? paymentOption;
+
+  /// The E-commerce indicator. example: [ECOMMERCE]
+  ///
+  String? eci;
+
+  /// It holds the customer’s IP address.
+  /// It’s Mandatory, if the fraud service is active.
+  /// We support IPv4 and IPv6 as shown in the example below.
+  ///
+  String? customerIp;
+
+  /// The customer’s phone number.
+  ///
+  String? phoneNumber;
+
   Map<String, dynamic> toFortRequest() {
     return <String, dynamic>{
       'command': command,
@@ -60,6 +87,11 @@ class FortRequest {
       'order_description': orderDescription,
       'language': language,
       'sdk_token': sdkToken,
+      'token_name': tokenName,
+      'payment_option': paymentOption,
+      'eci': eci,
+      'customer_ip': customerIp,
+      'phone_number': phoneNumber,
     };
   }
 }

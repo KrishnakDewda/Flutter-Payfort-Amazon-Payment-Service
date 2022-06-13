@@ -2,8 +2,6 @@ package com.vvvirani.amazon_payfort
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 
 import com.payfort.fortpaymentsdk.FortSdk
@@ -14,56 +12,35 @@ import com.payfort.fortpaymentsdk.exceptions.FortException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-class PayFortService : Activity() {
+class PayFortService  {
 
     private var tag = this.javaClass.simpleName
 
     private var fortCallback: FortCallBackManager? = null
 
-    override fun onResume() {
-        super.onResume()
-        initService()
-    }
-
-    companion object {
-
-        private var instance: PayFortService? = null
-
-        fun getInstance(): PayFortService? {
-            return instance
-        }
-    }
-
     interface PayFortResultHandler {
-        fun onResult(fortResult: MutableMap<String, Any?>)
+        fun onResult(fortResult: MutableMap<String, Any>?)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        initService()
-    }
-
-
-    private fun initService() {
-        instance = this
+    fun initService() {
         if (fortCallback == null) {
             fortCallback = FortCallBackManager.Factory.create()
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        fortCallback?.onActivityResult(requestCode, resultCode, data)
+     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+         fortCallback?.onActivityResult(requestCode, resultCode, data)
     }
 
     fun processingTransaction(
+        activity: Activity,
         environment: String?,
         fortRequest: FortRequest,
         result: PayFortResultHandler,
     ) {
         try {
             FortSdk.getInstance().registerCallback(
-                this,
+                activity,
                 fortRequest,
                 getEnvironment(environment), 5,
                 fortCallback,
@@ -74,12 +51,8 @@ class PayFortService : Activity() {
                         responeDic: MutableMap<String, Any>?,
                     ) {
                         Log.d(tag, "onSuccess : $requestDic $responeDic")
-
-                        val response: MutableMap<String, Any?> = HashMap()
-                        response["response_status"] = 0
-                        response["response_code"] = responeDic?.get("response_code")
-                        response["response_message"] = responeDic?.get("response_message")
-                        result.onResult(response)
+                        responeDic?.set("response_status", 0)
+                        result.onResult(responeDic)
                     }
 
                     override fun onFailure(
@@ -87,12 +60,8 @@ class PayFortService : Activity() {
                         responeDic: MutableMap<String, Any>?,
                     ) {
                         Log.d(tag, "onFailure : $requestDic $responeDic")
-
-                        val response: MutableMap<String, Any?> = HashMap()
-                        response["response_status"] = 2
-                        response["response_code"] = responeDic?.get("response_code")
-                        response["response_message"] = responeDic?.get("response_message")
-                        result.onResult(response)
+                        responeDic?.set("response_status", 2)
+                        result.onResult(responeDic)
                     }
 
                     override fun onCancel(
@@ -100,12 +69,8 @@ class PayFortService : Activity() {
                         responeDic: MutableMap<String, Any>?,
                     ) {
                         Log.d(tag, "onCancel : $requestDic $responeDic")
-
-                        val response: MutableMap<String, Any?> = HashMap()
-                        response["response_status"] = 1
-                        response["response_code"] = responeDic?.get("response_code")
-                        response["response_message"] = responeDic?.get("response_message")
-                        result.onResult(response)
+                        responeDic?.set("response_status", 1)
+                        result.onResult(responeDic)
                     }
                 },
             )
@@ -117,25 +82,17 @@ class PayFortService : Activity() {
     private fun getEnvironment(environment: String?): String {
         return when (environment) {
             "test" -> {
-                FortSdk.ENVIRONMENT.TEST
+                return FortSdk.ENVIRONMENT.TEST
             }
             "production" -> {
-                FortSdk.ENVIRONMENT.PRODUCTION
+                return FortSdk.ENVIRONMENT.PRODUCTION
             }
-            else -> ""
+            else -> FortSdk.ENVIRONMENT.TEST
         }
     }
 
-    fun getEnvironmentBaseUrl(env: String): String {
-        return when (env) {
-            "test" -> {
-                "https://sbpaymentservices.payfort.com/FortAPI/paymentApi"
-            }
-            "production" -> {
-                "https://paymentservices.payfort.com/FortAPI/paymentApi"
-            }
-            else -> ""
-        }
+    fun getEnvironmentBaseUrl(environment: String): String {
+        return getEnvironment(environment) + "/FortAPI/paymentApi"
     }
 
     fun createSignature(shaType: String, concatenatedString: String): String {
@@ -143,7 +100,7 @@ class PayFortService : Activity() {
             val bytes = concatenatedString.toByteArray()
             val md = MessageDigest.getInstance(shaType)
             val digest = md.digest(bytes)
-            return digest.fold("", { str, it -> str + "%02x".format(it) })
+            return digest.fold("") { str, it -> str + "%02x".format(it) }
         } catch (e: NoSuchAlgorithmException) {
             Log.d("Signature Error", e.toString())
         }

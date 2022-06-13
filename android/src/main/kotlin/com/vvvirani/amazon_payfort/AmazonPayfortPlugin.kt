@@ -1,6 +1,5 @@
 package com.vvvirani.amazon_payfort
 
-import android.app.Activity
 import android.content.Context
 
 import androidx.annotation.NonNull
@@ -22,7 +21,7 @@ class AmazonPayfortPlugin : FlutterPlugin,
     private lateinit var channel: MethodChannel
 
     private lateinit var context: Context
-    private lateinit var activity: Activity
+    private lateinit var binding: ActivityPluginBinding
 
     private var fortRequest = FortRequest()
     private var service: PayFortService? = null
@@ -38,7 +37,15 @@ class AmazonPayfortPlugin : FlutterPlugin,
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
         when (call.method) {
             "initialize" -> {
-                service = PayFortService.getInstance()
+                if (service == null) {
+                    service = PayFortService()
+                    service?.initService()
+                    binding.addActivityResultListener { requestCode, resultCode, data ->
+                        service?.onActivityResult(requestCode, resultCode, data)
+                        true
+                    }
+
+                }
             }
             "getEnvironmentBaseUrl" -> {
                 val envType = call.argument<String>("envType")
@@ -46,7 +53,7 @@ class AmazonPayfortPlugin : FlutterPlugin,
                 result.success(environment)
             }
             "getDeviceId" -> {
-                val deviceId = FortSdk.getDeviceId(activity)
+                val deviceId = FortSdk.getDeviceId(binding.activity)
                 result.success(deviceId)
             }
             "generateSignature" -> {
@@ -62,19 +69,17 @@ class AmazonPayfortPlugin : FlutterPlugin,
                 result.success(signature)
             }
             "processingTransaction" -> {
-                if (service == null) {
-                    service = PayFortService.getInstance()
-                }
                 val envType = call.argument<String>("envType")
 
                 fortRequest.requestMap = createRequestMap(call)
                 fortRequest.isShowResponsePage = true
 
                 service?.processingTransaction(
+                    binding.activity,
                     envType,
                     fortRequest,
                     object : PayFortService.PayFortResultHandler {
-                        override fun onResult(fortResult: MutableMap<String, Any?>) {
+                        override fun onResult(fortResult: MutableMap<String, Any>?) {
                             result.success(fortResult)
                         }
                     }
@@ -100,18 +105,23 @@ class AmazonPayfortPlugin : FlutterPlugin,
         requestMap["merchant_reference"] = call.argument<String>("merchant_reference")
         requestMap["order_description"] = call.argument<String>("order_description")
         requestMap["sdk_token"] = call.argument<String>("sdk_token")
+        requestMap["token_name"] = call.argument<String>("token_name")
+        requestMap["payment_option"] = call.argument<String>("payment_option")
+        requestMap["eci"] = call.argument<String>("eci")
+        requestMap["customer_ip"] = call.argument<String>("customer_ip")
+        requestMap["phone_number"] = call.argument<String>("phone_number")
         return requestMap
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        activity = binding.activity
+        this.binding = binding
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activity = binding.activity
+        this.binding = binding
     }
 
     override fun onDetachedFromActivity() {

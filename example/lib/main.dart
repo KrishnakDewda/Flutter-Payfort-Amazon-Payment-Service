@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
         sdkToken: response?.sdkToken ?? '',
         merchantReference: "Order ${DateTime.now().millisecondsSinceEpoch}",
         currency: 'SAR',
+        customerIp: '175.100.133.138',
       );
 
       var payfortResult = await _amazonPayfort.processingTransaction(request);
