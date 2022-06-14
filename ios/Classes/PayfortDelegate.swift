@@ -25,26 +25,24 @@ public class PayFortDelegate: NSObject {
     
     public func processingTransaction(requestData : Dictionary<String, Any>, viewController : UIViewController, result : @escaping ([String : Any]) -> Void){
         
+        var request = [String : String]()
+        request["command"] = (requestData["command"] as? String) ?? "";
+        request["customer_email"] = (requestData["customer_email"] as? String) ?? "";
+        request ["currency"] = (requestData["currency"] as? String) ?? "";
+        request[ "amount"] = (requestData["amount"] as? String) ?? "";
+        request["language"] = (requestData["language"] as? String) ?? "";
+        request ["merchant_reference"] = (requestData["merchant_reference"] as? String) ?? "";
+        request["order_description"] = (requestData["order_description"] as? String) ?? "";
+        request["sdk_token"] = (requestData["sdk_token"] as? String) ?? "";
+        request["token_name"] = (requestData["token_name"] as? String) ?? "";
+        request["payment_option"] = (requestData["payment_option"] as? String) ?? "";
+        request["eci"] = (requestData["eci"] as? String) ?? "";
+        request["customer_ip"] = (requestData["customer_ip"] as? String) ?? "";
+        request["phone_number"] = (requestData["phone_number"] as? String) ?? "";
         
-        let request = [
-            "command" : (requestData["command"] as? String) ?? "",
-            "customer_email" : (requestData["customer_email"] as? String) ?? "",
-            "currency" : (requestData["currency"] as? String) ?? "",
-            "amount" : (requestData["amount"] as? String) ?? "",
-            "language" : (requestData["language"] as? String) ?? "",
-            "merchant_reference" : (requestData["merchant_reference"] as? String) ?? "",
-            "order_description" : (requestData["order_description"] as? String) ?? "",
-            "sdk_token" : (requestData["sdk_token"] as? String) ?? "",
-            "token_name" : (requestData["token_name"] as? String) ?? "",
-            "payment_option" : (requestData["payment_option"] as? String) ?? "",
-            "eci" : (requestData["eci"] as? String) ?? "",
-            "customer_ip" : (requestData["customer_ip"] as? String) ?? "",
-            "phone_number" : (requestData["phone_number"] as? String) ?? "",
-        ]
-        
-        payFort?.hideLoading = true
-        payFort?.presentAsDefault = true
-        payFort?.isShowResponsePage = true
+        payFort?.hideLoading = false // For show loading
+        payFort?.presentAsDefault = true // For Change View
+        payFort?.isShowResponsePage = true // For show payment status page
         
         payFort?.callPayFort(
             withRequest: request,
