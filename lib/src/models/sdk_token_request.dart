@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class SdkTokenRequest {
   SdkTokenRequest({
     required this.accessCode,
@@ -9,28 +11,43 @@ class SdkTokenRequest {
 
   /// Request Command.
   ///
-  String command;
+  final String command;
 
   /// Alphanumeric access code.
   ///
-  String accessCode;
+  final String accessCode;
 
   /// The ID of the Merchant.
   ///
-  String merchantIdentifier;
+  final String merchantIdentifier;
 
   /// The checkout page and messages language.
   /// By default language is [en].
   ///
-  String language;
+  final String language;
 
   /// A unique device identifier.
   ///
-  String deviceId;
+  final String deviceId;
 
   /// A string hashed using the [Secure Hash Algorithm]. Please refer to section Signature.
   ///
-  String? signature;
+  final String? signature;
+
+  SdkTokenRequest copyWith({
+    String? accessCode,
+    String? merchantIdentifier,
+    String? language,
+    String? deviceId,
+    String? signature,
+  }) {
+    return SdkTokenRequest(
+      accessCode: accessCode ?? this.accessCode,
+      merchantIdentifier: merchantIdentifier ?? this.merchantIdentifier,
+      deviceId: deviceId ?? this.deviceId,
+      signature: signature ?? this.signature,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -51,5 +68,10 @@ class SdkTokenRequest {
         'merchant_identifier=$merchantIdentifier'
         'service_command=$command'
         '$shaRequestPhrase';
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toMap());
   }
 }

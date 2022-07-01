@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class FortRequest {
   FortRequest({
     required this.amount,
@@ -17,64 +19,64 @@ class FortRequest {
 
   /// Request Command.
   ///
-  String command;
+  final String command;
 
   /// The transaction’s amount.
   /// Each currency has predefined allowed decimal points that should be taken into consideration when sending the amount.
   ///
-  num amount;
+  final num amount;
 
   /// The currency of the transaction’s amount in ISO code 3. Example: AED, USD, EUR, GBP.
   /// By Default currency : [USD].
   ///
-  String currency;
+  final String currency;
 
   /// The Merchant’s unique order number.
   ///
-  String? merchantReference;
+  final String? merchantReference;
 
   /// The customer’s name.
   ///
-  String customerName;
+  final String customerName;
 
   /// The customer’s email. Example: customer1@domain.com
   ///
-  String customerEmail;
+  final String customerEmail;
 
   /// A description of the order.
   ///
-  String? orderDescription;
+  final String? orderDescription;
 
   /// The checkout page and messages language.
   /// By default language: [en].
   ///
-  String language;
+  final String language;
 
   /// An SDK Token to enable using the Amazon Payment Services Mobile SDK.
   ///
-  String sdkToken;
+  final String sdkToken;
 
   /// The Token received from the Tokenization process..
   ///
-  String? tokenName;
+  final String? tokenName;
 
   /// Payment option. [MASTERCARD], [VISA], [AMEX] etc...
   ///
-  String? paymentOption;
+  final String? paymentOption;
 
   /// The E-commerce indicator. example: [ECOMMERCE]
   ///
-  String? eci;
+  final String? eci;
 
   /// It holds the customer’s IP address.
   /// It’s Mandatory, if the fraud service is active.
   /// We support IPv4 and IPv6 as shown in the example below.
   ///
-  String? customerIp;
+  final String? customerIp;
 
   /// The customer’s phone number.
   ///
-  String? phoneNumber;
+  final String? phoneNumber;
 
   Map<String, dynamic> toFortRequest() {
     return <String, dynamic>{
@@ -93,5 +95,10 @@ class FortRequest {
       'customer_ip': customerIp,
       'phone_number': phoneNumber,
     };
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toFortRequest());
   }
 }

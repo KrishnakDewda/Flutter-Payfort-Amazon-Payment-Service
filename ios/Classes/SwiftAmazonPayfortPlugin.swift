@@ -1,8 +1,9 @@
 import Flutter
 import UIKit
 
-public class SwiftAmazonPayfortPlugin: NSObject, FlutterPlugin {
+public class SwiftAmazonPayfortPlugin: NSObject, FlutterPlugin, ApplePayResponseDelegateProtocol {
     
+    private var result :FlutterResult? = nil
     
     private var fortDelegate = PayFortDelegate()
     
@@ -17,12 +18,14 @@ public class SwiftAmazonPayfortPlugin: NSObject, FlutterPlugin {
     
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        self.result = result
         
         if call.method == "initialize" {
             
             if let args = call.arguments as? Dictionary<String, Any>{
                 let envType = args["envType"] as? String
                 fortDelegate.initialize(envType: envType)
+                fortDelegate.responseDelegate = self
             }
             
         } else if call.method == "getEnvironmentBaseUrl" {
@@ -47,20 +50,31 @@ public class SwiftAmazonPayfortPlugin: NSObject, FlutterPlugin {
                 result(signature)
             }
             
-        } else if call.method == "processingTransaction" {
+        } else if call.method == "callPayFort" {
             
             if let requestData = call.arguments as? Dictionary<String, Any>{
                 let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
-                fortDelegate.processingTransaction(requestData: requestData, viewController: viewController) { response in
+                fortDelegate.callPayFort(requestData: requestData, viewController: viewController) { response in
                     result(response)
                 }
                 
             }
             
+        } else if call.method == "callPayFortForApplePay" {
+            
+            if let requestData = call.arguments as? Dictionary<String, Any>{
+                let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
+                fortDelegate.callPayFortForApplePay(requestData: requestData, viewController: viewController)
+            }
+            
         } else {
             result(FlutterMethodNotImplemented)
         }
-    }    
+    }
+    
+    func onApplePayPaymentResponse(response: [String : Any]) {
+        result?(response)
+    }
 }
 
 

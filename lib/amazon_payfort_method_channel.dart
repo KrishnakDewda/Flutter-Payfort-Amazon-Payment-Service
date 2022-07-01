@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:amazon_payfort/amazon_payfort.dart';
+import 'package:amazon_payfort/src/local_platform.dart';
 import 'package:flutter/services.dart';
 
 import 'amazon_payfort_platform_interface.dart';
@@ -9,6 +10,8 @@ import 'amazon_payfort_platform_interface.dart';
 class MethodChannelAmazonPayfort extends AmazonPayfortPlatform {
   /// The method channel used to interact with the native platform.
   final methodChannel = const MethodChannel('vvvirani/amazon_payfort');
+
+  final LocalPlatform _platform = LocalPlatform();
 
   @override
   Future<void> initialize(FortEnvironment environment) {
@@ -33,18 +36,6 @@ class MethodChannelAmazonPayfort extends AmazonPayfortPlatform {
   }
 
   @override
-  Future<PayfortResult> processingTransaction(
-      {required FortEnvironment? environment, required FortRequest request}) {
-    var arguments = request.toFortRequest();
-    arguments.putIfAbsent('envType', () => environment?.name);
-    return methodChannel
-        .invokeMethod('processingTransaction', arguments)
-        .then((result) {
-      return PayfortResult.fromMap(Map<String, dynamic>.from(result));
-    });
-  }
-
-  @override
   Future<String?> generateSignature({
     required String shaType,
     required String concatenatedString,
@@ -56,5 +47,35 @@ class MethodChannelAmazonPayfort extends AmazonPayfortPlatform {
         'concatenatedString': concatenatedString
       },
     );
+  }
+
+  @override
+  Future<PayfortResult> callPayFort(
+      {required FortEnvironment? environment, required FortRequest request}) {
+    var arguments = request.toFortRequest();
+    arguments.putIfAbsent('envType', () => environment?.name);
+    return methodChannel.invokeMethod('callPayFort', arguments).then((result) {
+      return PayfortResult.fromMap(Map<String, dynamic>.from(result));
+    });
+  }
+
+  @override
+  Future<PayfortResult> callPayFortForApplePay({
+    required FortEnvironment? environment,
+    required FortRequest request,
+    required String applePayMerchantId,
+  }) {
+    if (_platform.isIOS) {
+      var arguments = request.toFortRequest();
+      arguments.putIfAbsent('envType', () => environment?.name);
+      arguments.putIfAbsent('applePayMerchantId', () => applePayMerchantId);
+      return methodChannel
+          .invokeMethod('callPayFortForApplePay', arguments)
+          .then((result) {
+        return PayfortResult.fromMap(Map<String, dynamic>.from(result));
+      });
+    } else {
+      throw Exception('Apple Pay is not supported on this device');
+    }
   }
 }

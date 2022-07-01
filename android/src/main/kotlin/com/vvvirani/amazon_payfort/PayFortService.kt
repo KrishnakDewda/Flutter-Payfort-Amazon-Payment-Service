@@ -32,7 +32,7 @@ class PayFortService  {
          fortCallback?.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun processingTransaction(
+    fun callPayFort(
         activity: Activity,
         environment: String?,
         fortRequest: FortRequest,

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:amazon_payfort/src/enums/response_status.dart';
 
 class PayfortResult {
@@ -161,5 +163,10 @@ class PayfortResult {
       'status': status,
       'phone_number': phoneNumber,
     };
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toMap());
   }
 }

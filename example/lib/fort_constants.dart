@@ -12,4 +12,6 @@ class FortConstants {
   static const String shaType = 'SHA-256';
 
   static const String shaRequestPhrase = '87cpfpOPZY6fn0GLn7fY98?}';
+
+  static const String applePayMerchantId = 'merchant.d.dooskarting.com';
 }

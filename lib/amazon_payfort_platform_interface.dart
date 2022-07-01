@@ -30,13 +30,19 @@ abstract class AmazonPayfortPlatform extends PlatformInterface {
 
   Future<String?> getDeviceId();
 
-  Future<PayfortResult> processingTransaction({
+  Future<String?> generateSignature({
+    required String shaType,
+    required String concatenatedString,
+  });
+
+  Future<PayfortResult> callPayFort({
     required FortEnvironment? environment,
     required FortRequest request,
   });
 
-  Future<String?> generateSignature({
-    required String shaType,
-    required String concatenatedString,
+  Future<PayfortResult> callPayFortForApplePay({
+    required FortEnvironment? environment,
+    required FortRequest request,
+    required String applePayMerchantId,
   });
 }

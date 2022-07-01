@@ -30,21 +30,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //
-  final AmazonPayfort _amazonPayfort = AmazonPayfort.instance;
+  // Step 1 : Create a instance of AmazonPayfort.
+  final AmazonPayfort _amazonPayfort =
+      AmazonPayfort.instance(FortConstants.environment);
 
   bool _loading = false;
   String? _message;
 
-  @override
-  void initState() {
-    super.initState();
-
-    /// Step 1: Initialize AmazonPayfort with the environment.
-    AmazonPayfort.initialize(FortConstants.environment);
-  }
-
-  Future<void> _processingTransaction() async {
+  Future<void> _paymentHandler({bool payWithApplePay = false}) async {
     try {
       _setLoading(true);
 
@@ -65,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             tokenRequest.toConcatenatedString(FortConstants.shaRequestPhrase),
       );
 
-      tokenRequest.signature = signature;
+      tokenRequest = tokenRequest.copyWith(signature: signature);
 
       /// Step 3 : Generate the SDK Token
       SdkTokenResponse? response = await PayFortApi.generateSdkToken(
@@ -83,7 +76,12 @@ class _MyHomePageState extends State<MyHomePage> {
         customerIp: '175.100.133.138',
       );
 
-      var payfortResult = await _amazonPayfort.processingTransaction(request);
+      var payfortResult = payWithApplePay
+          ? await _amazonPayfort.callPayFortForApplePay(
+              request: request,
+              applePayMerchantId: FortConstants.applePayMerchantId,
+            )
+          : await _amazonPayfort.callPayFort(request);
 
       _message = payfortResult.toMap().toString();
     } catch (e) {
@@ -93,8 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } finally {
       _setLoading(false);
     }
-
-    setState(() {});
   }
 
   void _setLoading(bool loading) {
@@ -121,8 +117,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       textAlign: TextAlign.center,
                     ),
                   ElevatedButton(
-                    onPressed: _processingTransaction,
-                    child: const Text('Pay \$10 Now'),
+                    onPressed: () {
+                      _paymentHandler();
+                    },
+                    child: const Text('Pay with Card'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _paymentHandler(payWithApplePay: true);
+                    },
+                    child: const Text('Pay with Apple Pay'),
                   ),
                 ],
               ),

@@ -12,7 +12,8 @@ export 'src/models/fort_request.dart';
 
 /// Amazon Payment Services is the new name for PayFort.
 /// PayFort is a leading provider of payment processing services that was acquired by Amazon in 2017.
-/// Throughout this section, and in our API reference and SDK guides, you will see reference to PayFort. You may also see reference to Fort or FORT.
+/// Throughout this section, and in our API reference and SDK guides, you will see reference to PayFort.
+/// You may also see reference to Fort or FORT.
 /// We continue to use PayFort and Fort in our documentation for the simple reason
 /// that the code that powers Amazon Payment Services still contains references to PayFort.
 /// To ensure ongoing stability, and to minimize the development overhead for our customers,
@@ -21,41 +22,19 @@ export 'src/models/fort_request.dart';
 /// you can safely assume that we are referring to Amazon Payment Services features and benefits.
 ///
 class AmazonPayfort {
-  AmazonPayfort._();
+  final FortEnvironment? _environment;
 
-  factory AmazonPayfort() {
-    assert(
-      _instance != null,
-      '\nEnsure to initialize AmazonPayfort before accessing it.\nPlease execute the init method : AmazonPayfort.initialize()',
-    );
-    return _instance ?? AmazonPayfort._();
-  }
+  AmazonPayfort._(this._environment);
 
-  static AmazonPayfort? _instance;
-  static AmazonPayfort get instance => _instance ?? AmazonPayfort._();
-
-  FortEnvironment? _environment;
-
-  static void initialize(
-
-      /// This parameter used to determine whether the request is going to be submitted to the test/sandbox or production environment.
-      /// It has two possible values:
-      /// - FortEnvironment.test / sandbox
-      /// - FortEnvironment.production
-      FortEnvironment fortEnvironment) async {
-    _instance ??= AmazonPayfort._();
-    _instance?._environment = fortEnvironment;
-
-    /// Initialize the Payfort with the environment.
-    ///
-    AmazonPayfortPlatform.instance.initialize(fortEnvironment);
+  factory AmazonPayfort.instance(FortEnvironment environment) {
+    AmazonPayfortPlatform.instance.initialize(environment);
+    return AmazonPayfort._(environment);
   }
 
   /// These are the URLs you need to use when you request a mobile SDK token for your app:
   ///
   Future<String?> getEnvironmentBaseUrl() {
-    return AmazonPayfortPlatform.instance
-        .getEnvironmentBaseUrl(_instance?._environment);
+    return AmazonPayfortPlatform.instance.getEnvironmentBaseUrl(_environment);
   }
 
   /// Please make sure to use the following function to generate the [device_id] parameter value that
@@ -83,10 +62,23 @@ class AmazonPayfort {
   /// You can use the standard Amazon Payment Services mobile SDK interface to display a standard payment screen.
   /// This standard payment view is customizable in three ways.
   ///
-  Future<PayfortResult> processingTransaction(FortRequest request) {
-    return AmazonPayfortPlatform.instance.processingTransaction(
-      environment: _instance?._environment,
+  Future<PayfortResult> callPayFort(FortRequest request) {
+    return AmazonPayfortPlatform.instance.callPayFort(
+      environment: _environment,
       request: request,
+    );
+  }
+
+  ///  Apple Pay is a digital wallet that allows your customers to
+  /// make payments using different Apple devices via the Amazon Payment Services iOS SDK.
+  Future<PayfortResult> callPayFortForApplePay({
+    required FortRequest request,
+    required String applePayMerchantId,
+  }) {
+    return AmazonPayfortPlatform.instance.callPayFortForApplePay(
+      environment: _environment,
+      request: request,
+      applePayMerchantId: applePayMerchantId,
     );
   }
 }

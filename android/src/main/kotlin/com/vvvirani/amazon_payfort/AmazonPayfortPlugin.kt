@@ -68,13 +68,13 @@ class AmazonPayfortPlugin : FlutterPlugin,
                     }
                 result.success(signature)
             }
-            "processingTransaction" -> {
+            "callPayFort" -> {
                 val envType = call.argument<String>("envType")
 
                 fortRequest.requestMap = createRequestMap(call)
                 fortRequest.isShowResponsePage = true
 
-                service?.processingTransaction(
+                service?.callPayFort(
                     binding.activity,
                     envType,
                     fortRequest,
@@ -98,6 +98,7 @@ class AmazonPayfortPlugin : FlutterPlugin,
     private fun createRequestMap(call: MethodCall): MutableMap<String, Any?> {
         val requestMap: MutableMap<String, Any?> = HashMap()
         requestMap["command"] = call.argument<String>("command")
+        requestMap["customer_name"] = call.argument<String>("customer_name")
         requestMap["customer_email"] = call.argument<String>("customer_email")
         requestMap["currency"] = call.argument<String>("currency")
         requestMap["amount"] = call.argument<String>("amount")
