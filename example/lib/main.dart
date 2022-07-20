@@ -37,7 +37,61 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _loading = false;
   String? _message;
 
-  Future<void> _paymentHandler({bool payWithApplePay = false}) async {
+  Future<void> _applePayPaymentHandler() async {
+    try {
+      _setLoading(true);
+
+      /// Step 2 : Get the baseUrl, DeiveId and Singature of the SDK Token
+      String? baseUrl = await _amazonPayfort.getEnvironmentBaseUrl();
+
+      String? deviceId = await _amazonPayfort.getDeviceId();
+
+      SdkTokenRequest tokenRequest = SdkTokenRequest(
+        accessCode: FortConstants.applePayAccessCode,
+        merchantIdentifier: FortConstants.merchantIdentifier,
+        deviceId: deviceId ?? '',
+      );
+
+      String? signature = await _amazonPayfort.generateSignature(
+        shaType: FortConstants.applePayShaType,
+        concatenatedString: tokenRequest
+            .toConcatenatedString(FortConstants.applePayShaRequestPhrase),
+      );
+
+      tokenRequest = tokenRequest.copyWith(signature: signature);
+
+      /// Step 3 : Generate the SDK Token
+      SdkTokenResponse? response = await PayFortApi.generateSdkToken(
+          Uri.parse(baseUrl ?? ''), tokenRequest);
+
+      /// Step 4 : Processing Transaction
+      FortRequest request = FortRequest(
+        amount: 1000,
+        customerName: 'Test Customer',
+        customerEmail: 'test@customer.com',
+        orderDescription: 'Test Order',
+        sdkToken: response?.sdkToken ?? '',
+        merchantReference: 'Order ${DateTime.now().millisecondsSinceEpoch}',
+        currency: 'SAR',
+        customerIp: '175.100.133.138',
+      );
+
+      var payfortResult = await _amazonPayfort.callPayFortForApplePay(
+        request: request,
+        applePayMerchantId: FortConstants.applePayMerchantId,
+      );
+
+      _message = payfortResult.toMap().toString();
+    } catch (e) {
+      _setLoading(false);
+      log(e.toString());
+      _message = e.toString();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> _paymentHandler() async {
     try {
       _setLoading(true);
 
@@ -71,17 +125,12 @@ class _MyHomePageState extends State<MyHomePage> {
         customerEmail: 'test@customer.com',
         orderDescription: 'Test Order',
         sdkToken: response?.sdkToken ?? '',
-        merchantReference: "Order ${DateTime.now().millisecondsSinceEpoch}",
+        merchantReference: 'Order ${DateTime.now().millisecondsSinceEpoch}',
         currency: 'SAR',
         customerIp: '175.100.133.138',
       );
 
-      var payfortResult = payWithApplePay
-          ? await _amazonPayfort.callPayFortForApplePay(
-              request: request,
-              applePayMerchantId: FortConstants.applePayMerchantId,
-            )
-          : await _amazonPayfort.callPayFort(request);
+      var payfortResult = await _amazonPayfort.callPayFort(request);
 
       _message = payfortResult.toMap().toString();
     } catch (e) {
@@ -117,15 +166,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       textAlign: TextAlign.center,
                     ),
                   ElevatedButton(
-                    onPressed: () {
-                      _paymentHandler();
-                    },
+                    onPressed: _paymentHandler,
                     child: const Text('Pay with Card'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      _paymentHandler(payWithApplePay: true);
-                    },
+                    onPressed: _applePayPaymentHandler,
                     child: const Text('Pay with Apple Pay'),
                   ),
                 ],
