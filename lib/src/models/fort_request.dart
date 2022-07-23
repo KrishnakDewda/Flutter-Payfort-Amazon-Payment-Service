@@ -97,6 +97,25 @@ class FortRequest {
     };
   }
 
+  Map<String, dynamic> toApplePayFortRequest() {
+    return <String, dynamic>{
+      'command': 'AUTHORIZATION',
+      'amount': amount.toString(),
+      'merchant_reference': '${DateTime.now().millisecondsSinceEpoch}',
+      'currency': currency,
+      'customer_name': customerName,
+      'customer_email': customerEmail,
+      'order_description': orderDescription,
+      'language': language,
+      'sdk_token': sdkToken,
+      'token_name': tokenName,
+      'payment_option': paymentOption,
+      'eci': eci,
+      'customer_ip': customerIp,
+      'phone_number': phoneNumber,
+    };
+  }
+
   @override
   String toString() {
     return jsonEncode(toFortRequest());
