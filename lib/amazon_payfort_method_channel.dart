@@ -66,7 +66,7 @@ class MethodChannelAmazonPayfort extends AmazonPayfortPlatform {
     required String applePayMerchantId,
   }) {
     if (_platform.isIOS) {
-      var arguments = request.toApplePayFortRequest();
+      var arguments = request.toFortRequest();
       arguments.putIfAbsent('envType', () => environment?.name);
       arguments.putIfAbsent('applePayMerchantId', () => applePayMerchantId);
       return methodChannel
