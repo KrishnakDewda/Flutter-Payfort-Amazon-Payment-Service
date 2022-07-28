@@ -97,6 +97,38 @@ class FortRequest {
     };
   }
 
+  FortRequest copyWith({
+    num? amount,
+    String? currency,
+    String? merchantReference,
+    String? customerName,
+    String? customerEmail,
+    String? orderDescription,
+    String? language,
+    String? sdkToken,
+    String? tokenName,
+    String? paymentOption,
+    String? eci,
+    String? customerIp,
+    String? phoneNumber,
+  }) {
+    return FortRequest(
+      amount: amount ?? this.amount,
+      currency: currency ?? this.currency,
+      merchantReference: merchantReference ?? this.merchantReference,
+      customerName: customerName ?? this.customerName,
+      customerEmail: customerEmail ?? this.customerEmail,
+      orderDescription: orderDescription ?? this.orderDescription,
+      language: language ?? this.language,
+      sdkToken: sdkToken ?? this.sdkToken,
+      tokenName: tokenName ?? this.tokenName,
+      paymentOption: paymentOption ?? this.paymentOption,
+      eci: eci ?? this.eci,
+      customerIp: customerIp ?? this.customerIp,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+    );
+  }
+
   @override
   String toString() {
     return jsonEncode(toFortRequest());

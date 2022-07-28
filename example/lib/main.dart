@@ -5,6 +5,7 @@ import 'package:amazon_payfort_example/fort_constants.dart';
 import 'package:amazon_payfort_example/payfort_api.dart';
 import 'package:amazon_payfort_example/sdk_token_response.dart';
 import 'package:flutter/material.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +34,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // Step 1 : Create a instance of AmazonPayfort.
   final AmazonPayfort _amazonPayfort =
       AmazonPayfort.instance(FortConstants.environment);
+
+  final NetworkInfo _info = NetworkInfo();
 
   bool _loading = false;
   String? _message;
@@ -73,8 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
         sdkToken: response?.sdkToken ?? '',
         merchantReference: 'Order ${DateTime.now().millisecondsSinceEpoch}',
         currency: 'SAR',
-        customerIp: '175.100.133.138',
+        customerIp: await _info.getWifiIP(),
       );
+
+      log(request.toFortRequest().toString());
 
       var payfortResult = await _amazonPayfort.callPayFortForApplePay(
         request: request,
@@ -82,6 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       _message = payfortResult.toMap().toString();
+      
     } catch (e) {
       _setLoading(false);
       log(e.toString());
@@ -127,8 +133,10 @@ class _MyHomePageState extends State<MyHomePage> {
         sdkToken: response?.sdkToken ?? '',
         merchantReference: 'Order ${DateTime.now().millisecondsSinceEpoch}',
         currency: 'SAR',
-        customerIp: '175.100.133.138',
+        customerIp: await _info.getWifiIP(),
       );
+
+      log(request.toFortRequest().toString());
 
       var payfortResult = await _amazonPayfort.callPayFort(request);
 
