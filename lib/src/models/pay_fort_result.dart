@@ -122,7 +122,7 @@ class PayfortResult {
       merchantReference: data['merchant_reference'],
       amount: data['amount'],
       currency: data['currency'],
-      fortId: data['fortId'],
+      fortId: data['fort_id'],
       customerEmail: data['customer_email'],
       sdkToken: data['sdk_token'],
       tokenName: data['token_name'],
